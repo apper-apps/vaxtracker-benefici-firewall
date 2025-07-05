@@ -105,10 +105,10 @@ let aValue = a[sortConfig.key]
       className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden"
     >
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
+<table className="min-w-full divide-y divide-slate-200">
           <thead className="bg-slate-50">
             <tr>
-<SortableHeader label="Vaccine Name" sortKey="commercial_name" />
+              <SortableHeader label="Vaccine Name" sortKey="commercial_name" />
               <SortableHeader label="Generic Name" sortKey="generic_name" />
               <SortableHeader label="Lot Number" sortKey="lot_number" />
               <SortableHeader label="Expiration Date" sortKey="expiration_date" />
@@ -123,9 +123,9 @@ let aValue = a[sortConfig.key]
               )}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-slate-200">
+<tbody className="bg-white divide-y divide-slate-200">
             {sortedVaccines.map((vaccine, index) => {
-              const expirationStatus = getExpirationStatus(vaccine.expiration_date || vaccine.expirationDate)
+              const expirationStatus = getExpirationStatus(vaccine.expiration_date)
               
               return (
                 <motion.tr
@@ -137,24 +137,24 @@ let aValue = a[sortConfig.key]
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-slate-900">
-                      {vaccine.commercial_name || vaccine.commercialName}
+                      {vaccine.commercial_name}
                     </div>
                     <div className="text-sm text-slate-500">
-                      {vaccine.vaccine_family || vaccine.vaccineFamily}
+                      {vaccine.vaccine_family}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {vaccine.generic_name || vaccine.genericName}
+                    {vaccine.generic_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {vaccine.lot_number || vaccine.lotNumber}
-</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {format(new Date(vaccine.expiration_date || vaccine.expirationDate), 'MMM dd, yyyy')}
+                    {vaccine.lot_number}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    {format(new Date(vaccine.expiration_date), 'MMM dd, yyyy')}
+                  </td>
+<td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-slate-900">
-                      {vaccine.quantity_on_hand || vaccine.quantityOnHand}
+                      {vaccine.quantity_on_hand}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -167,7 +167,7 @@ let aValue = a[sortConfig.key]
                       <input
                         type="number"
                         min="0"
-                        max={vaccine.quantity_on_hand || vaccine.quantityOnHand}
+                        max={vaccine.quantity_on_hand}
                         value={administrationData[vaccine.Id] || ''}
                         onChange={(e) => handleAdministrationChange(vaccine.Id, e.target.value)}
                         className="w-20 px-2 py-1 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
