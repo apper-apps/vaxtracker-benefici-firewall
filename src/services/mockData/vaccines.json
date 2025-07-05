@@ -1,0 +1,58 @@
+[
+  {
+    "Id": 1,
+    "commercialName": "Pfizer-BioNTech COVID-19",
+    "genericName": "COVID-19 mRNA Vaccine",
+    "vaccineFamily": "COVID-19",
+    "currentStock": 150
+  },
+  {
+    "Id": 2,
+    "commercialName": "Moderna COVID-19",
+    "genericName": "COVID-19 mRNA Vaccine",
+    "vaccineFamily": "COVID-19",
+    "currentStock": 120
+  },
+  {
+    "Id": 3,
+    "commercialName": "Fluzone Quadrivalent",
+    "genericName": "Influenza Vaccine",
+    "vaccineFamily": "Influenza",
+    "currentStock": 200
+  },
+  {
+    "Id": 4,
+    "commercialName": "Prevnar 13",
+    "genericName": "Pneumococcal Conjugate Vaccine",
+    "vaccineFamily": "Pneumococcal",
+    "currentStock": 80
+  },
+  {
+    "Id": 5,
+    "commercialName": "Gardasil 9",
+    "genericName": "HPV Vaccine",
+    "vaccineFamily": "HPV",
+    "currentStock": 60
+  },
+  {
+    "Id": 6,
+    "commercialName": "Hepatitis B Vaccine",
+    "genericName": "Hepatitis B Vaccine",
+    "vaccineFamily": "Hepatitis",
+    "currentStock": 90
+  },
+  {
+    "Id": 7,
+    "commercialName": "Tdap Vaccine",
+    "genericName": "Tetanus, Diphtheria, Pertussis Vaccine",
+    "vaccineFamily": "Tdap",
+    "currentStock": 110
+  },
+  {
+    "Id": 8,
+    "commercialName": "MMR Vaccine",
+    "genericName": "Measles, Mumps, Rubella Vaccine",
+    "vaccineFamily": "MMR",
+    "currentStock": 75
+  }
+]
