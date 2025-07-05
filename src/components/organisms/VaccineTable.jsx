@@ -21,10 +21,10 @@ const VaccineTable = ({
     if (!sortConfig.key) return vaccines
     
     return [...vaccines].sort((a, b) => {
-      let aValue = a[sortConfig.key]
+let aValue = a[sortConfig.key]
       let bValue = b[sortConfig.key]
       
-      if (sortConfig.key === 'expirationDate') {
+      if (sortConfig.key === 'expiration_date' || sortConfig.key === 'expirationDate') {
         aValue = new Date(aValue)
         bValue = new Date(bValue)
       }
@@ -108,11 +108,11 @@ const VaccineTable = ({
         <table className="min-w-full divide-y divide-slate-200">
           <thead className="bg-slate-50">
             <tr>
-              <SortableHeader label="Vaccine Name" sortKey="commercialName" />
-              <SortableHeader label="Generic Name" sortKey="genericName" />
-              <SortableHeader label="Lot Number" sortKey="lotNumber" />
-              <SortableHeader label="Expiration Date" sortKey="expirationDate" />
-              <SortableHeader label="Quantity on Hand" sortKey="quantityOnHand" />
+<SortableHeader label="Vaccine Name" sortKey="commercial_name" />
+              <SortableHeader label="Generic Name" sortKey="generic_name" />
+              <SortableHeader label="Lot Number" sortKey="lot_number" />
+              <SortableHeader label="Expiration Date" sortKey="expiration_date" />
+              <SortableHeader label="Quantity on Hand" sortKey="quantity_on_hand" />
               <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                 Status
               </th>
@@ -125,7 +125,7 @@ const VaccineTable = ({
           </thead>
           <tbody className="bg-white divide-y divide-slate-200">
             {sortedVaccines.map((vaccine, index) => {
-              const expirationStatus = getExpirationStatus(vaccine.expirationDate)
+              const expirationStatus = getExpirationStatus(vaccine.expiration_date || vaccine.expirationDate)
               
               return (
                 <motion.tr
@@ -137,24 +137,24 @@ const VaccineTable = ({
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-slate-900">
-                      {vaccine.commercialName}
+                      {vaccine.commercial_name || vaccine.commercialName}
                     </div>
                     <div className="text-sm text-slate-500">
-                      {vaccine.vaccineFamily}
+                      {vaccine.vaccine_family || vaccine.vaccineFamily}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {vaccine.genericName}
+                    {vaccine.generic_name || vaccine.genericName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {vaccine.lotNumber}
-                  </td>
+                    {vaccine.lot_number || vaccine.lotNumber}
+</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {format(new Date(vaccine.expirationDate), 'MMM dd, yyyy')}
+                    {format(new Date(vaccine.expiration_date || vaccine.expirationDate), 'MMM dd, yyyy')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-slate-900">
-                      {vaccine.quantityOnHand}
+                      {vaccine.quantity_on_hand || vaccine.quantityOnHand}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -167,7 +167,7 @@ const VaccineTable = ({
                       <input
                         type="number"
                         min="0"
-                        max={vaccine.quantityOnHand}
+                        max={vaccine.quantity_on_hand || vaccine.quantityOnHand}
                         value={administrationData[vaccine.Id] || ''}
                         onChange={(e) => handleAdministrationChange(vaccine.Id, e.target.value)}
                         className="w-20 px-2 py-1 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"

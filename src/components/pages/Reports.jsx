@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns'
-import { toast } from 'react-toastify'
-import Button from '@/components/atoms/Button'
-import FormField from '@/components/molecules/FormField'
-import Loading from '@/components/ui/Loading'
-import Error from '@/components/ui/Error'
-import { vaccineLotService } from '@/services/api/vaccineLotService'
-import { administrationService } from '@/services/api/administrationService'
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { endOfMonth, format, startOfMonth, subMonths } from "date-fns";
+import { toast } from "react-toastify";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
+import FormField from "@/components/molecules/FormField";
+import { vaccineLotService } from "@/services/api/vaccineLotService";
+import { administrationService } from "@/services/api/administrationService";
 
 const Reports = () => {
   const [vaccineLots, setVaccineLots] = useState([])
@@ -48,14 +48,14 @@ const Reports = () => {
       return adminDate >= startDate && adminDate <= endDate
     })
 
-    const reportData = vaccineLots.map(lot => {
-      const lotAdministrations = monthlyAdministrations.filter(admin => admin.lotId === lot.Id)
+const reportData = vaccineLots.map(lot => {
+      const lotAdministrations = monthlyAdministrations.filter(admin => (admin.lot_id || admin.lotId) === lot.Id)
       const totalAdministered = lotAdministrations.reduce((sum, admin) => sum + admin.doses, 0)
       
       return {
         ...lot,
         administered: totalAdministered,
-        reconciled: reconciliationData[lot.Id] || lot.quantityOnHand
+        reconciled: reconciliationData[lot.Id] || (lot.quantity_on_hand || lot.quantityOnHand || 0)
       }
     })
 
@@ -73,10 +73,10 @@ const Reports = () => {
     try {
       for (const [lotId, newQuantity] of Object.entries(reconciliationData)) {
         const lot = vaccineLots.find(l => l.Id === parseInt(lotId))
-        if (lot && newQuantity !== lot.quantityOnHand) {
+if (lot && newQuantity !== (lot.quantity_on_hand || lot.quantityOnHand || 0)) {
           await vaccineLotService.update(parseInt(lotId), {
             ...lot,
-            quantityOnHand: newQuantity
+            quantity_on_hand: newQuantity
           })
         }
       }
@@ -90,18 +90,18 @@ const Reports = () => {
     }
   }
 
-  const exportReport = () => {
+const exportReport = () => {
     const reportData = generateMonthlyReport()
     const csvContent = [
-      ['Commercial Name', 'Generic Name', 'Lot Number', 'Expiration Date', 'Quantity on Hand', 'Administered', 'Status'].join(','),
+      ['Commercial Name', 'Generic Name', 'Lot Number', 'Expiration Date', 'Quantity On Hand', 'Administered', 'Status'].join(','),
       ...reportData.map(lot => [
-        lot.commercialName,
-        lot.genericName,
-        lot.lotNumber,
-        format(new Date(lot.expirationDate), 'yyyy-MM-dd'),
-        lot.quantityOnHand,
+        lot.commercial_name || lot.commercialName,
+        lot.generic_name || lot.genericName,
+        lot.lot_number || lot.lotNumber,
+        format(new Date(lot.expiration_date || lot.expirationDate), 'yyyy-MM-dd'),
+        lot.quantity_on_hand || lot.quantityOnHand || 0,
         lot.administered,
-        new Date(lot.expirationDate) < new Date() ? 'Expired' : 'Active'
+        new Date(lot.expiration_date || lot.expirationDate) < new Date() ? 'Expired' : 'Active'
       ].join(','))
     ].join('\n')
 
@@ -122,8 +122,8 @@ const Reports = () => {
     return <Error message={error} onRetry={loadData} />
   }
 
-  const reportData = generateMonthlyReport()
-  const totalDoses = reportData.reduce((sum, lot) => sum + lot.quantityOnHand, 0)
+const reportData = generateMonthlyReport()
+  const totalDoses = reportData.reduce((sum, lot) => sum + (lot.quantity_on_hand || lot.quantityOnHand || 0), 0)
   const totalAdministered = reportData.reduce((sum, lot) => sum + lot.administered, 0)
 
   return (
@@ -225,28 +225,27 @@ const Reports = () => {
             <tbody className="bg-white divide-y divide-slate-200">
               {reportData.map((lot) => (
                 <tr key={lot.Id} className="hover:bg-slate-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-slate-900">{lot.commercialName}</div>
-                    <div className="text-sm text-slate-500">{lot.genericName}</div>
+<td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-slate-900">{lot.commercial_name || lot.commercialName}</div>
+                    <div className="text-sm text-slate-500">{lot.generic_name || lot.genericName}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {lot.lotNumber}
+                    {lot.lot_number || lot.lotNumber}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {format(new Date(lot.expirationDate), 'MMM dd, yyyy')}
+                    {format(new Date(lot.expiration_date || lot.expirationDate), 'MMM dd, yyyy')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                    {lot.quantityOnHand}
+                    {lot.quantity_on_hand || lot.quantityOnHand || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                     {lot.administered}
                   </td>
-                  {reconciliationMode && (
+{reconciliationMode && (
                     <td className="px-6 py-4 whitespace-nowrap">
                       <input
                         type="number"
-                        min="0"
-                        value={reconciliationData[lot.Id] || lot.quantityOnHand}
+                        value={reconciliationData[lot.Id] || (lot.quantity_on_hand || lot.quantityOnHand || 0)}
                         onChange={(e) => handleReconciliationChange(lot.Id, e.target.value)}
                         className="w-24 px-2 py-1 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       />

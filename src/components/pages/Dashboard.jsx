@@ -47,11 +47,11 @@ const Dashboard = () => {
     const now = new Date()
     const thirtyDaysFromNow = addDays(now, 30)
     
-    return vaccineLots.reduce((acc, lot) => {
-      const expDate = new Date(lot.expirationDate)
-      const administered = lot.administeredDoses || 0
+return vaccineLots.reduce((acc, lot) => {
+      const expDate = new Date(lot.expiration_date || lot.expirationDate)
+      const administered = lot.administered_doses || lot.administeredDoses || 0
       
-      acc.totalDoses += lot.quantityOnHand
+      acc.totalDoses += (lot.quantity_on_hand || lot.quantityOnHand || 0)
       acc.administeredDoses += administered
       
       if (isBefore(expDate, now)) {
@@ -60,10 +60,9 @@ const Dashboard = () => {
         acc.expiringSoon += 1
       }
       
-      if (lot.quantityOnHand <= 10) {
+      if ((lot.quantity_on_hand || lot.quantityOnHand || 0) <= 10) {
         acc.lowStock += 1
       }
-      
       return acc
     }, {
       totalDoses: 0,
@@ -78,14 +77,14 @@ const Dashboard = () => {
     const now = new Date()
     const thirtyDaysFromNow = addDays(now, 30)
     
-    return vaccineLots.filter(lot => {
-      const expDate = new Date(lot.expirationDate)
+return vaccineLots.filter(lot => {
+      const expDate = new Date(lot.expiration_date || lot.expirationDate)
       return isBefore(expDate, thirtyDaysFromNow) && isAfter(expDate, now)
     }).slice(0, 5)
   }
 
   const getLowStockVaccines = () => {
-    return vaccineLots.filter(lot => lot.quantityOnHand <= 10).slice(0, 5)
+    return vaccineLots.filter(lot => (lot.quantity_on_hand || lot.quantityOnHand || 0) <= 10).slice(0, 5)
   }
 
   if (loading) {

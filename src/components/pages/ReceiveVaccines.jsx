@@ -124,20 +124,20 @@ const ReceiveVaccines = () => {
     try {
       setSubmitting(true)
       
-      const selectedVaccine = vaccines.find(v => v.Id === parseInt(formData.vaccineId))
+const selectedVaccine = vaccines.find(v => v.Id === parseInt(formData.vaccineId))
       
       const newLot = {
-        vaccineId: formData.vaccineId,
-        commercialName: selectedVaccine.commercialName,
-        genericName: selectedVaccine.genericName,
-        vaccineFamily: selectedVaccine.vaccineFamily,
-        lotNumber: formData.lotNumber,
-        expirationDate: formData.expirationDate,
-        quantityOnHand: parseInt(formData.passedInspection),
-        receivedDate: new Date().toISOString(),
-        passedInspection: parseInt(formData.passedInspection),
-        failedInspection: parseInt(formData.failedInspection),
-        discrepancyReason: formData.discrepancyReason || null
+        vaccine_id: formData.vaccineId,
+        commercial_name: selectedVaccine.commercial_name || selectedVaccine.commercialName,
+        generic_name: selectedVaccine.generic_name || selectedVaccine.genericName,
+        vaccine_family: selectedVaccine.vaccine_family || selectedVaccine.vaccineFamily,
+        lot_number: formData.lotNumber,
+        expiration_date: formData.expirationDate,
+        quantity_on_hand: parseInt(formData.passedInspection),
+        received_date: new Date().toISOString(),
+        passed_inspection: parseInt(formData.passedInspection),
+        failed_inspection: parseInt(formData.failedInspection),
+        discrepancy_reason: formData.discrepancyReason || null
       }
 
       await vaccineLotService.create(newLot)
@@ -172,9 +172,9 @@ const ReceiveVaccines = () => {
     return <Error message={error} onRetry={loadVaccines} />
   }
 
-  const vaccineOptions = vaccines.map(vaccine => ({
+const vaccineOptions = vaccines.map(vaccine => ({
     value: vaccine.Id,
-    label: `${vaccine.commercialName} (${vaccine.genericName})`
+    label: `${vaccine.commercial_name || vaccine.commercialName} (${vaccine.generic_name || vaccine.genericName})`
   }))
 
   return (

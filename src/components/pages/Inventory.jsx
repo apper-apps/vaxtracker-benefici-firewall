@@ -45,17 +45,17 @@ const Inventory = () => {
     let filtered = [...vaccineLots]
 
     // Search filter
-    if (filters.search) {
+if (filters.search) {
       filtered = filtered.filter(lot =>
-        lot.commercialName.toLowerCase().includes(filters.search.toLowerCase()) ||
-        lot.genericName.toLowerCase().includes(filters.search.toLowerCase()) ||
-        lot.lotNumber.toLowerCase().includes(filters.search.toLowerCase())
+        (lot.commercial_name || lot.commercialName || '').toLowerCase().includes(filters.search.toLowerCase()) ||
+        (lot.generic_name || lot.genericName || '').toLowerCase().includes(filters.search.toLowerCase()) ||
+        (lot.lot_number || lot.lotNumber || '').toLowerCase().includes(filters.search.toLowerCase())
       )
     }
 
     // Vaccine family filter
-    if (filters.vaccineFamily) {
-      filtered = filtered.filter(lot => lot.vaccineFamily === filters.vaccineFamily)
+if (filters.vaccineFamily) {
+      filtered = filtered.filter(lot => (lot.vaccine_family || lot.vaccineFamily) === filters.vaccineFamily)
     }
 
     // Status filter
@@ -63,8 +63,8 @@ const Inventory = () => {
       const now = new Date()
       const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
       
-      filtered = filtered.filter(lot => {
-        const expDate = new Date(lot.expirationDate)
+filtered = filtered.filter(lot => {
+        const expDate = new Date(lot.expiration_date || lot.expirationDate)
         switch (filters.status) {
           case 'good':
             return expDate > thirtyDaysFromNow
@@ -90,23 +90,23 @@ const Inventory = () => {
       const lot = vaccineLots.find(l => l.Id === lotId)
       if (!lot) return
 
-      if (doses > lot.quantityOnHand) {
+if (doses > (lot.quantity_on_hand || lot.quantityOnHand || 0)) {
         toast.error('Cannot administer more doses than available')
         return
       }
 
-      // Record administration
+// Record administration
       await administrationService.create({
-        lotId,
+        lot_id: lotId,
         doses,
         date: new Date().toISOString(),
-        administeredBy: 'Healthcare Staff'
+        administered_by: 'Healthcare Staff'
       })
 
       // Update lot quantity
       const updatedLot = {
         ...lot,
-        quantityOnHand: lot.quantityOnHand - doses
+        quantity_on_hand: (lot.quantity_on_hand || lot.quantityOnHand || 0) - doses
       }
       await vaccineLotService.update(lotId, updatedLot)
 
@@ -118,8 +118,8 @@ const Inventory = () => {
     }
   }
 
-  const getVaccineFamilyOptions = () => {
-    const families = [...new Set(vaccineLots.map(lot => lot.vaccineFamily))]
+const getVaccineFamilyOptions = () => {
+    const families = [...new Set(vaccineLots.map(lot => lot.vaccine_family || lot.vaccineFamily))]
     return families.map(family => ({ value: family, label: family }))
   }
 

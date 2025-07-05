@@ -44,7 +44,7 @@ const VaccineLoss = () => {
         vaccineLotService.getAll(),
         lossReportService.getAll()
       ])
-      setVaccineLots(lotsData.filter(lot => lot.quantityOnHand > 0))
+setVaccineLots(lotsData.filter(lot => (lot.quantity_on_hand || lot.quantityOnHand || 0) > 0))
       setLossReports(reportsData)
     } catch (err) {
       setError('Failed to load data')
@@ -52,7 +52,6 @@ const VaccineLoss = () => {
       setLoading(false)
     }
   }
-
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
@@ -76,10 +75,10 @@ const VaccineLoss = () => {
       errors.quantity = 'Quantity must be greater than 0'
     }
     
-    if (formData.lotId) {
+if (formData.lotId) {
       const selectedLot = vaccineLots.find(lot => lot.Id === parseInt(formData.lotId))
-      if (selectedLot && quantity > selectedLot.quantityOnHand) {
-        errors.quantity = `Quantity cannot exceed available doses (${selectedLot.quantityOnHand})`
+      if (selectedLot && quantity > (selectedLot.quantity_on_hand || selectedLot.quantityOnHand || 0)) {
+        errors.quantity = `Quantity cannot exceed available doses (${selectedLot.quantity_on_hand || selectedLot.quantityOnHand || 0})`
       }
     }
     
@@ -98,23 +97,23 @@ const VaccineLoss = () => {
     try {
       setSubmitting(true)
       
-      const selectedLot = vaccineLots.find(lot => lot.Id === parseInt(formData.lotId))
+const selectedLot = vaccineLots.find(lot => lot.Id === parseInt(formData.lotId))
       const lossQuantity = parseInt(formData.quantity)
       
       // Create loss report
       await lossReportService.create({
-        lotId: parseInt(formData.lotId),
+        lot_id: parseInt(formData.lotId),
         quantity: lossQuantity,
         reason: formData.reason,
         details: formData.details,
-        trainingCompleted: formData.trainingCompleted,
+        training_completed: formData.trainingCompleted,
         date: new Date().toISOString()
       })
 
       // Update vaccine lot quantity
       const updatedLot = {
         ...selectedLot,
-        quantityOnHand: selectedLot.quantityOnHand - lossQuantity
+        quantity_on_hand: (selectedLot.quantity_on_hand || selectedLot.quantityOnHand || 0) - lossQuantity
       }
       await vaccineLotService.update(parseInt(formData.lotId), updatedLot)
 
@@ -146,9 +145,9 @@ const VaccineLoss = () => {
     return <Error message={error} onRetry={loadData} />
   }
 
-  const vaccineOptions = vaccineLots.map(lot => ({
+const vaccineOptions = vaccineLots.map(lot => ({
     value: lot.Id,
-    label: `${lot.commercialName} - ${lot.lotNumber} (${lot.quantityOnHand} doses)`
+    label: `${lot.commercial_name || lot.commercialName} - ${lot.lot_number || lot.lotNumber} (${lot.quantity_on_hand || lot.quantityOnHand || 0} doses)`
   }))
 
   return (
@@ -249,14 +248,14 @@ const VaccineLoss = () => {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Recent Loss Reports</h2>
           
           <div className="space-y-4">
-            {lossReports.slice(0, 5).map((report) => {
-              const lot = vaccineLots.find(l => l.Id === report.lotId)
+{lossReports.slice(0, 5).map((report) => {
+              const lot = vaccineLots.find(l => l.Id === (report.lot_id || report.lotId))
               return (
                 <div key={report.Id} className="border-l-4 border-red-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-slate-900">
-                        {lot ? `${lot.commercialName} - ${lot.lotNumber}` : 'Unknown Lot'}
+                        {lot ? `${lot.commercial_name || lot.commercialName} - ${lot.lot_number || lot.lotNumber}` : 'Unknown Lot'}
                       </p>
                       <p className="text-sm text-slate-600">
                         {report.quantity} doses - {report.reason}

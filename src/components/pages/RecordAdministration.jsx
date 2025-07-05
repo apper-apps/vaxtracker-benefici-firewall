@@ -32,7 +32,7 @@ const RecordAdministration = () => {
       setError('')
       const data = await vaccineLotService.getAll()
       // Only show lots with available doses
-      const availableLots = data.filter(lot => lot.quantityOnHand > 0)
+const availableLots = data.filter(lot => (lot.quantity_on_hand || lot.quantityOnHand || 0) > 0)
       setVaccineLots(availableLots)
     } catch (err) {
       setError('Failed to load vaccine lots')
@@ -47,10 +47,10 @@ const RecordAdministration = () => {
       return
     }
 
-    const filtered = vaccineLots.filter(lot =>
-      lot.commercialName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lot.genericName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lot.lotNumber.toLowerCase().includes(searchTerm.toLowerCase())
+const filtered = vaccineLots.filter(lot =>
+      (lot.commercial_name || lot.commercialName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lot.generic_name || lot.genericName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (lot.lot_number || lot.lotNumber || '').toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredLots(filtered)
   }
@@ -74,10 +74,10 @@ const RecordAdministration = () => {
 
     // Validate doses don't exceed available quantity
     const errors = []
-    for (const { lotId, doses } of administrations) {
+for (const { lotId, doses } of administrations) {
       const lot = vaccineLots.find(l => l.Id === lotId)
-      if (lot && doses > lot.quantityOnHand) {
-        errors.push(`Cannot administer ${doses} doses of ${lot.commercialName} (${lot.lotNumber}) - only ${lot.quantityOnHand} available`)
+      if (lot && doses > (lot.quantity_on_hand || lot.quantityOnHand || 0)) {
+        errors.push(`Cannot administer ${doses} doses of ${lot.commercial_name || lot.commercialName} (${lot.lot_number || lot.lotNumber}) - only ${lot.quantity_on_hand || lot.quantityOnHand || 0} available`)
       }
     }
 
@@ -93,18 +93,18 @@ const RecordAdministration = () => {
       for (const { lotId, doses } of administrations) {
         const lot = vaccineLots.find(l => l.Id === lotId)
         
-        // Record administration
+// Record administration
         await administrationService.create({
-          lotId,
+          lot_id: lotId,
           doses,
           date: new Date().toISOString(),
-          administeredBy: 'Healthcare Staff'
+          administered_by: 'Healthcare Staff'
         })
 
         // Update lot quantity
         const updatedLot = {
           ...lot,
-          quantityOnHand: lot.quantityOnHand - doses
+          quantity_on_hand: (lot.quantity_on_hand || lot.quantityOnHand || 0) - doses
         }
         await vaccineLotService.update(lotId, updatedLot)
         
